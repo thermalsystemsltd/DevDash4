@@ -10,27 +10,31 @@ process.chdir(projectDir);
 
 // Create necessary directories and files if they don't exist
 const setupProject = () => {
-    // Create pages directory if it doesn't exist
-    if (!fs.existsSync('pages')) {
-        fs.mkdirSync('pages');
+    // Create app directory (Next.js 13+ app directory)
+    if (!fs.existsSync('app')) {
+        fs.mkdirSync('app');
     }
 
-    // Create _app.js if it doesn't exist
-    const appContent = `
-import '../styles/globals.css'
-
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
+    // Create app/layout.tsx
+    const layoutContent = `
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
 }
-
-export default MyApp
 `;
-    if (!fs.existsSync('pages/_app.js')) {
-        fs.writeFileSync('pages/_app.js', appContent);
+    if (!fs.existsSync('app/layout.tsx')) {
+        fs.writeFileSync('app/layout.tsx', layoutContent);
     }
 
-    // Create index.js if it doesn't exist
-    const indexContent = `
+    // Create app/page.tsx
+    const pageContent = `
 export default function Home() {
   return (
     <div>
@@ -39,33 +43,60 @@ export default function Home() {
   )
 }
 `;
-    if (!fs.existsSync('pages/index.js')) {
-        fs.writeFileSync('pages/index.js', indexContent);
+    if (!fs.existsSync('app/page.tsx')) {
+        fs.writeFileSync('app/page.tsx', pageContent);
     }
 
-    // Create styles directory and globals.css
-    if (!fs.existsSync('styles')) {
-        fs.mkdirSync('styles');
+    // Create tsconfig.json if it doesn't exist
+    const tsconfigContent = `{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
     }
-    if (!fs.existsSync('styles/globals.css')) {
-        fs.writeFileSync('styles/globals.css', `
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}`;
+    if (!fs.existsSync('tsconfig.json')) {
+        fs.writeFileSync('tsconfig.json', tsconfigContent);
+    }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
-}
-`);
+    // Update package.json dependencies
+    const packageJsonPath = path.join(projectDir, 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+        packageJson.dependencies = {
+            ...packageJson.dependencies,
+            "next": "^14.0.0",
+            "react": "^18.2.0",
+            "react-dom": "^18.2.0"
+        };
+        packageJson.devDependencies = {
+            ...packageJson.devDependencies,
+            "@types/node": "^20.0.0",
+            "@types/react": "^18.2.0",
+            "@types/react-dom": "^18.2.0",
+            "typescript": "^5.0.0"
+        };
+        fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
     }
 };
 
@@ -76,7 +107,8 @@ setupProject();
 const shellScript = `
 @echo off
 cd "${projectDir.replace(/\\/g, '\\\\')}"
-npm install && npm run dev
+call npm install
+call npm run dev
 `;
 
 // Write the shell script
