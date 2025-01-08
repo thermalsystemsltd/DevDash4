@@ -13,8 +13,8 @@ const ecosystemConfig = `
 module.exports = {
   apps: [{
     name: 'DevDash',
-    script: 'npx',
-    args: 'next dev',
+    script: 'npm',
+    args: 'run dev',
     cwd: '${projectDir.replace(/\\/g, '\\\\')}',
     env: {
       NODE_ENV: 'development',
@@ -44,9 +44,8 @@ function runCommand(command, ignoreError = false) {
 }
 
 try {
-    // Clean up existing processes (ignore errors)
-    runCommand('pm2 delete all', true);
-    runCommand('pm2 reset all', true);
+    // Only delete the DevDash process if it exists
+    runCommand('pm2 delete DevDash', true);
 
     // Clean up existing files
     console.log('Cleaning up existing files...');
