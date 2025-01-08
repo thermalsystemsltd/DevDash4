@@ -11,7 +11,7 @@ export type LiveDataResponse = LiveDataReading[];
 export interface SensorReading {
   timestamp: string;
   temperature: number;
-  humidity?: number;
+  hum?: number;
   battery: number;
   rssi: number | null;
 }
