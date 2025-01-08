@@ -13,39 +13,43 @@ const ecosystemConfig = `
 module.exports = {
   apps: [{
     name: 'DevDash',
-    script: 'npm',
-    args: 'run dev',
+    script: 'npx',
+    args: 'next dev',
     cwd: '${projectDir.replace(/\\/g, '\\\\')}',
     env: {
-      NODE_ENV: 'development'
+      NODE_ENV: 'development',
+      PORT: 3000
     },
-    watch: false
+    watch: false,
+    interpreter: 'node'
   }]
 };
 `;
 
-// Write ecosystem config
-fs.writeFileSync('ecosystem.config.js', ecosystemConfig);
+// Write ecosystem config with .cjs extension
+fs.writeFileSync('ecosystem.config.cjs', ecosystemConfig);
 
 // Function to run a command
-function runCommand(command) {
+function runCommand(command, ignoreError = false) {
     try {
         execSync(command, { stdio: 'inherit' });
+        return true;
     } catch (error) {
-        console.error(`Failed to execute: ${command}`);
-        throw error;
+        if (!ignoreError) {
+            console.error(`Failed to execute: ${command}`);
+            throw error;
+        }
+        return false;
     }
 }
 
 try {
-    // Clean up existing processes
-    try {
-        runCommand('pm2 delete DevDash');
-    } catch (error) {
-        // Ignore errors if process doesn't exist
-    }
+    // Clean up existing processes (ignore errors)
+    runCommand('pm2 delete all', true);
+    runCommand('pm2 reset all', true);
 
     // Clean up existing files
+    console.log('Cleaning up existing files...');
     if (fs.existsSync('.next')) {
         fs.rmSync('.next', { recursive: true, force: true });
     }
@@ -59,11 +63,22 @@ try {
 
     // Start with PM2
     console.log('Starting PM2...');
-    runCommand('pm2 start ecosystem.config.js');
-    runCommand('pm2 save');
-
-    console.log('Application started successfully!');
-    console.log('You can view logs using: pm2 logs DevDash');
+    runCommand('pm2 start ecosystem.config.cjs');
+    
+    // Wait a moment for the process to start
+    setTimeout(() => {
+        // Save PM2 configuration
+        runCommand('pm2 save', true);
+        
+        // Show status
+        console.log('\nPM2 Status:');
+        runCommand('pm2 list');
+        
+        console.log('\nApplication started successfully!');
+        console.log('You can view logs using: pm2 logs DevDash');
+        console.log('To restart the app use: pm2 restart DevDash');
+        console.log('To stop the app use: pm2 stop DevDash');
+    }, 2000);
 
 } catch (error) {
     console.error('Error:', error);
