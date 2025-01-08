@@ -117,15 +117,29 @@ export default function SensorDetailsPage() {
         borderWidth: 1.5,
         pointRadius: 0,
         pointHitRadius: 10,
-        cubicInterpolationMode: 'monotone'
-      }
+        yAxisID: 'y'
+      },
+      ...(sensor.type === '3' ? [{
+        label: 'Humidity (%RH)',
+        data: readings?.map(reading => ({
+          x: new Date(reading.timestamp),
+          y: reading.humidity
+        })) || [],
+        borderColor: 'rgb(192, 75, 192)',
+        tension: 0.3,
+        borderWidth: 1.5,
+        pointRadius: 0,
+        pointHitRadius: 10,
+        yAxisID: 'y1'
+      }] : [])
     ]
   };
 
   const chartOptions = getChartOptions({
     sensorName: sensor.name,
     selectedRangeHours: selectedRange.hours,
-    onZoomChange: setIsZoomed
+    onZoomChange: setIsZoomed,
+    showHumidity: sensor.type === '3'
   });
 
   return (

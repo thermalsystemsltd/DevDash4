@@ -38,6 +38,7 @@ export const sensorDataApi = rootApi.injectEndpoints({
         return response.map(reading => ({
           timestamp: reading.timestamp,
           temperature: parseFloat(reading.temperature),
+          humidity: reading.humidity ? parseFloat(reading.humidity) : undefined,
           battery: parseFloat(reading.battery || '0'),
           rssi: reading.rssi ? parseInt(reading.rssi) : null
         }));

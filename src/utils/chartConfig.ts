@@ -5,12 +5,14 @@ interface ChartConfigOptions {
   sensorName: string;
   selectedRangeHours: number;
   onZoomChange: (zoomed: boolean) => void;
+  showHumidity: boolean;
 }
 
 export const getChartOptions = ({
   sensorName,
   selectedRangeHours,
-  onZoomChange
+  onZoomChange,
+  showHumidity
 }: ChartConfigOptions): ChartOptions<'line'> => ({
   responsive: true,
   maintainAspectRatio: false,
@@ -52,7 +54,7 @@ export const getChartOptions = ({
     },
     title: {
       display: true,
-      text: `Temperature Readings for ${sensorName}`
+      text: `${sensorName} - Temperature${showHumidity ? ' & Humidity' : ''} Readings`
     }
   },
   scales: {
@@ -63,11 +65,6 @@ export const getChartOptions = ({
         displayFormats: {
           hour: 'HH:mm',
           day: 'MMM d'
-        },
-        adapters: {
-          date: {
-            locale: enUS
-          }
         }
       },
       title: {
@@ -79,11 +76,25 @@ export const getChartOptions = ({
       }
     },
     y: {
+      type: 'linear',
+      display: true,
+      position: 'left',
       title: {
         display: true,
         text: 'Temperature (°C)'
+      }
+    },
+    y1: {
+      type: 'linear',
+      display: showHumidity,
+      position: 'right',
+      title: {
+        display: true,
+        text: 'Humidity (%RH)'
       },
-      beginAtZero: false
+      grid: {
+        drawOnChartArea: false
+      }
     }
   }
 });
