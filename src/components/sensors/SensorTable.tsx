@@ -1,5 +1,5 @@
 import React from 'react';
-import { Battery, Signal, Thermometer, WifiOff } from 'lucide-react';
+import { Battery, Signal, Thermometer, WifiOff, Droplets } from 'lucide-react';
 import { Sensor } from '../../types';
 import { useGetLiveDataQuery } from '../../services/sensorDataApi';
 import { getBatteryStatus } from '../../utils/batteryUtils';
@@ -61,20 +61,31 @@ export default function SensorTable({ sensors }: SensorTableProps) {
                 </div>
               </td>
               <td className="px-1 sm:px-4 py-2 sm:py-4">
-                <div className="flex items-center">
-                  <Thermometer className="h-5 w-5 text-gray-400" />
-                  <span className="ml-2 text-sm text-gray-900 dark:text-white">
-                    {(() => {
-                      const reading = liveData?.find(d => d.sensor_id === sensor.serialNo?.toString());
-                      if (!reading) return '***';
-                      
-                      const temp = reading.temperature?.toFixed(1);
-                      if (sensor.type === '3' && reading.humidity !== undefined) {
-                        return `${temp}°C/${reading.humidity.toFixed(1)}%RH`;
-                      }
-                      return `${temp}°C`;
-                    })()}
-                  </span>
+                <div className="flex flex-col">
+                  <div className="flex items-center">
+                    <Thermometer className="h-5 w-5 text-gray-400" />
+                    <span className="ml-2 text-sm text-gray-900 dark:text-white">
+                      {(() => {
+                        const reading = liveData?.find(d => d.sensor_id === sensor.serialNo?.toString());
+                        if (!reading) return '***';
+                        return `${reading.temperature?.toFixed(1)}°C`;
+                      })()}
+                    </span>
+                  </div>
+                  {(() => {
+                    const reading = liveData?.find(d => d.sensor_id === sensor.serialNo?.toString());
+                    if (sensor.type === '3' && reading?.humidity !== undefined) {
+                      return (
+                        <div className="flex items-center mt-1">
+                          <Droplets className="h-5 w-5 text-gray-400" />
+                          <span className="ml-2 text-sm text-gray-900 dark:text-white">
+                            {reading.humidity.toFixed(1)}%RH
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
               </td>
               <td className="px-1 sm:px-4 py-2 sm:py-4">
