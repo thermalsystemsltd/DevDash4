@@ -123,7 +123,7 @@ export default function SensorDetailsPage() {
         label: 'Humidity (%RH)',
         data: readings?.map(reading => ({
           x: new Date(reading.timestamp),
-          y: reading.humidity
+          y: reading.hum
         })) || [],
         borderColor: 'rgb(192, 75, 192)',
         tension: 0.3,
