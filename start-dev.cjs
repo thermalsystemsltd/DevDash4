@@ -15,6 +15,20 @@ const setupProject = () => {
         fs.mkdirSync('app');
     }
 
+    // Create next.config.js
+    const nextConfigContent = `/** @type {import('next').NextConfig} */
+const nextConfig = {
+  experimental: {
+    appDir: true,
+  },
+}
+
+module.exports = nextConfig
+`;
+    if (!fs.existsSync('next.config.js')) {
+        fs.writeFileSync('next.config.js', nextConfigContent);
+    }
+
     // Create app/layout.tsx
     const layoutContent = `
 export default function RootLayout({
@@ -46,73 +60,23 @@ export default function Home() {
     if (!fs.existsSync('app/page.tsx')) {
         fs.writeFileSync('app/page.tsx', pageContent);
     }
-
-    // Create tsconfig.json if it doesn't exist
-    const tsconfigContent = `{
-  "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "paths": {
-      "@/*": ["./*"]
-    }
-  },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
-}`;
-    if (!fs.existsSync('tsconfig.json')) {
-        fs.writeFileSync('tsconfig.json', tsconfigContent);
-    }
-
-    // Update package.json dependencies
-    const packageJsonPath = path.join(projectDir, 'package.json');
-    if (fs.existsSync(packageJsonPath)) {
-        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-        packageJson.dependencies = {
-            ...packageJson.dependencies,
-            "next": "^14.0.0",
-            "react": "^18.2.0",
-            "react-dom": "^18.2.0"
-        };
-        packageJson.devDependencies = {
-            ...packageJson.devDependencies,
-            "@types/node": "^20.0.0",
-            "@types/react": "^18.2.0",
-            "@types/react-dom": "^18.2.0",
-            "typescript": "^5.0.0"
-        };
-        fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-    }
 };
 
 // Setup the project structure
 setupProject();
 
 // Create a shell script that PM2 can run
-const shellScript = `
+const installScript = `
 @echo off
 cd "${projectDir.replace(/\\/g, '\\\\')}"
-call npm install
+call npm install next@latest react@latest react-dom@latest
+call npm install --save-dev typescript @types/react @types/node @types/react-dom
+call npx create-next-app@latest . --ts --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --no-git --force
 call npm run dev
 `;
 
 // Write the shell script
-fs.writeFileSync(path.join(projectDir, 'start-dev.cmd'), shellScript);
+fs.writeFileSync(path.join(projectDir, 'start-dev.cmd'), installScript);
 
 // Make it executable (not needed for Windows but good practice)
 try {
