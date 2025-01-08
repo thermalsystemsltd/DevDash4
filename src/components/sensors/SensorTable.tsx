@@ -34,7 +34,7 @@ export default function SensorTable({ sensors }: SensorTableProps) {
               Data
             </th>
             <th className="px-1 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/4">
-              Status
+              Sig/Batt
             </th>
             <th className="px-1 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Last Reading
