@@ -2,6 +2,7 @@ export interface LiveDataReading {
   sensor_id: string;
   sensor_name: string;
   temperature: number;
+  humidity?: number;
   timestamp: string;
 }
 

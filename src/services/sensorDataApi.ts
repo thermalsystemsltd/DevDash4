@@ -18,6 +18,7 @@ export const sensorDataApi = rootApi.injectEndpoints({
           sensor_id: item.sensor_id?.toString() ?? '',
           sensor_name: item.sensor_name ?? '',
           temperature: parseFloat(item.temperature ?? '0'),
+          humidity: item.humidity ? parseFloat(item.humidity) : undefined,
           timestamp: item.timestamp
         }));
       }

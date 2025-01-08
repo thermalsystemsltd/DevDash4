@@ -31,7 +31,7 @@ export default function SensorTable({ sensors }: SensorTableProps) {
               Sensor Info
             </th>
             <th className="px-1 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Temperature
+              Data
             </th>
             <th className="px-1 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-1/4">
               Status
@@ -64,7 +64,16 @@ export default function SensorTable({ sensors }: SensorTableProps) {
                 <div className="flex items-center">
                   <Thermometer className="h-5 w-5 text-gray-400" />
                   <span className="ml-2 text-sm text-gray-900 dark:text-white">
-                    {liveData?.find(d => d.sensor_id === sensor.serialNo?.toString())?.temperature?.toFixed(1) ?? '***'}°C
+                    {(() => {
+                      const reading = liveData?.find(d => d.sensor_id === sensor.serialNo?.toString());
+                      if (!reading) return '***';
+                      
+                      const temp = reading.temperature?.toFixed(1);
+                      if (sensor.type === '3' && reading.humidity !== undefined) {
+                        return `${temp}°C/${reading.humidity.toFixed(1)}%RH`;
+                      }
+                      return `${temp}°C`;
+                    })()}
                   </span>
                 </div>
               </td>

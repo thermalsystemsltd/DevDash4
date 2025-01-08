@@ -112,7 +112,9 @@ export default function DashboardPage() {
                     </dt>
                     <dd className="text-sm sm:text-lg font-medium text-gray-900 dark:text-white">
                       {liveData?.reduce((count, reading) => {
-                        return count + (reading?.temperature > 25 || reading?.temperature < -25 ? 1 : 0);
+                        const tempAlert = reading?.temperature > 25 || reading?.temperature < -25;
+                        const humAlert = reading?.humidity !== undefined && (reading.humidity > 80 || reading.humidity < 20);
+                        return count + (tempAlert || humAlert ? 1 : 0);
                       }, 0) ?? 0}
                     </dd>
                   </dl>
